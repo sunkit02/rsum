@@ -21,6 +21,9 @@ enum Config {
 
 fn main() -> Result<(), String> {
     let config = parse_args(env::args().collect())?;
+
+    dbg!(&config);
+
     let num_str = match config {
         Config::Stdin => {
             let mut buf = String::new();
@@ -43,23 +46,27 @@ fn main() -> Result<(), String> {
 }
 
 fn parse_args(args: Vec<String>) -> Result<Config, String> {
-    let mut args = args.into_iter();
-
     // Ignore very first argument given by OS
-    args.next()
-        .expect("No name of command invoking this binary given.");
+    let mut args_iter = args.iter().skip(1);
 
-    if let Some(first_arg) = args.next() {
+    if let Some(first_arg) = args_iter.next() {
         match first_arg.as_str() {
             "-f" => {
-                if let Some(second_arg) = args.next() {
+                if let Some(second_arg) = args_iter.next() {
                     Ok(Config::File(PathBuf::from(second_arg)))
                 } else {
                     Err("Missing path to file.".to_owned())
                 }
             }
             "-h" => Ok(Config::PrintHelp),
-            _ => Ok(Config::CliArg(first_arg)),
+            _ => Ok(Config::CliArg(args.into_iter().skip(1).fold(
+                String::new(),
+                |mut acc, num_str| {
+                    acc.push_str(num_str.as_str());
+                    acc.push(' ');
+                    acc
+                },
+            ))),
         }
     } else {
         Ok(Config::Stdin)
@@ -67,6 +74,7 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
 }
 
 fn parse_num_str(num_str: String) -> Result<Vec<f32>, String> {
+    dbg!(&num_str);
     let num_str = num_str.chars().filter(|&c| c != ',').collect::<String>();
     let num_str = num_str
         .trim()
@@ -99,7 +107,7 @@ mod test {
         let args = vec!["./rsum".to_owned(), "1 2 3".to_owned()];
 
         let parsed_config = parse_args(args);
-        let expected = Config::CliArg("1 2 3".to_owned());
+        let expected = Config::CliArg("1 2 3 ".to_owned());
 
         assert_eq!(parsed_config, Ok(expected));
     }

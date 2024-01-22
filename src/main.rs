@@ -6,7 +6,7 @@ use std::{
 };
 
 const HELP_MENU: &'static str = r#"
-Sums up space and or newline delimeted numbers (both integers and decimals) and prints result to stdout.
+Sums up space and or newline delimited numbers (both integers and decimals) and prints result to stdout.
 Input can be from stdin (no flag) or a file (-f flag).
 Note: Commas in the numbers are allowed.
 "#;
@@ -157,7 +157,7 @@ mod test {
     }
 
     #[test]
-    fn can_parse_num_str_space_delimeted() {
+    fn can_parse_num_str_space_delimited() {
         let num_str = "0.1 10 20.5 30,000 40.".to_owned();
 
         let nums = parse_num_str(num_str);
@@ -168,7 +168,7 @@ mod test {
     }
 
     #[test]
-    fn can_parse_num_str_newline_delimeted() {
+    fn can_parse_num_str_newline_delimited() {
         let num_str = "0.1\n10\n20.5\n30,000\n40.".to_owned();
 
         let nums = parse_num_str(num_str);
@@ -179,7 +179,7 @@ mod test {
     }
 
     #[test]
-    fn can_parse_num_str_space_and_newline_delimeted() {
+    fn can_parse_num_str_space_and_newline_delimited() {
         let num_str = "0.1 10\n20.5 30,000\n40.".to_owned();
 
         let nums = parse_num_str(num_str);

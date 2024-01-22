@@ -68,16 +68,22 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
 
 fn parse_num_str(num_str: String) -> Result<Vec<f32>, String> {
     let num_str = num_str.chars().filter(|&c| c != ',').collect::<String>();
-
-    let parse_result: Result<Vec<f32>, _> = num_str
+    let num_str = num_str
         .trim()
         .split('\n')
         .map(|line| line.split(' '))
         .flatten()
-        .map(|n| n.parse::<f32>())
-        .collect();
+        .collect::<Vec<&str>>();
 
-    parse_result.map_err(|e| e.to_string())
+    let parse_results: Vec<Result<f32, _>> = num_str.iter().map(|n| n.parse::<f32>()).collect();
+
+    for (result, num_str) in parse_results.iter().zip(num_str.iter()) {
+        if let Err(_) = result {
+            return Err(format!("Failed to parse '{}'", num_str));
+        }
+    }
+
+    Ok(parse_results.into_iter().flatten().collect())
 }
 
 fn print_help() {

@@ -49,6 +49,8 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
     // Ignore very first argument given by OS
     let mut args_iter = args.iter().skip(1);
 
+    let args_len = args_iter.len();
+
     if let Some(first_arg) = args_iter.next() {
         match first_arg.as_str() {
             "-f" => {
@@ -59,11 +61,13 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
                 }
             }
             "-h" => Ok(Config::PrintHelp),
-            _ => Ok(Config::CliArg(args.into_iter().skip(1).fold(
+            _ => Ok(Config::CliArg(args.into_iter().skip(1).enumerate().fold(
                 String::new(),
-                |mut acc, num_str| {
+                |mut acc, (i, num_str)| {
                     acc.push_str(num_str.as_str());
-                    acc.push(' ');
+                    if i < args_len - 1 {
+                        acc.push(' ');
+                    }
                     acc
                 },
             ))),
@@ -107,7 +111,7 @@ mod test {
         let args = vec!["./rsum".to_owned(), "1 2 3".to_owned()];
 
         let parsed_config = parse_args(args);
-        let expected = Config::CliArg("1 2 3 ".to_owned());
+        let expected = Config::CliArg("1 2 3".to_owned());
 
         assert_eq!(parsed_config, Ok(expected));
     }

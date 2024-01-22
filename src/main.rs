@@ -22,8 +22,6 @@ enum Config {
 fn main() -> Result<(), String> {
     let config = parse_args(env::args().collect())?;
 
-    dbg!(&config);
-
     let num_str = match config {
         Config::Stdin => {
             let mut buf = String::new();
@@ -83,7 +81,6 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
 }
 
 fn parse_num_str(num_str: String) -> Result<Vec<f32>, String> {
-    dbg!(&num_str);
     let num_str = num_str.chars().filter(|&c| c != ',').collect::<String>();
     let num_str = num_str
         .trim()

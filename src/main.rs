@@ -54,17 +54,16 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
     if let Some(first_arg) = args_iter.next() {
         match first_arg.as_str() {
             "-f" => {
-                if let Some(second_arg) = args_iter.next() {
-                    Ok(Config::File(PathBuf::from(second_arg)))
-                } else {
-                    Err("Missing path to file.".to_owned())
-                }
+                let path = args_iter
+                    .next()
+                    .ok_or_else(|| "Missing path to file.".to_owned())?;
+
+                Ok(Config::File(PathBuf::from(path)))
             }
             "-h" => Ok(Config::PrintHelp),
             _ => {
                 let str_len = args.iter().map(|num_str| num_str.len()).sum::<usize>() + args_len;
-
-                Ok(Config::CliArg(args.into_iter().skip(1).enumerate().fold(
+                let num_str = args.into_iter().skip(1).enumerate().fold(
                     String::with_capacity(str_len),
                     |mut acc, (i, num_str)| {
                         acc.push_str(num_str.as_str());
@@ -73,7 +72,9 @@ fn parse_args(args: Vec<String>) -> Result<Config, String> {
                         }
                         acc
                     },
-                )))
+                );
+
+                Ok(Config::CliArg(num_str))
             }
         }
     } else {
